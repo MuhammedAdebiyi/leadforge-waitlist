@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeadForge — Admin</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          paper: { DEFAULT: '#F3EEE1', 1: '#ECE4D1' },
+          ink:   { DEFAULT: '#18130F', dim: '#5A4E3F', muted: '#8C7F6A' },
+          gold:  { DEFAULT: '#E3A72E' },
+          rust:  { DEFAULT: '#C4522C' },
+        },
+        fontFamily: {
+          display: ['"Space Grotesk"', 'sans-serif'],
+          sans: ['Inter', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace'],
+        },
+        borderWidth: { 3: '3px' },
+        boxShadow: { brut: '4px 4px 0 0 #18130F' },
+      },
+    },
+  }
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  body { background: #F3EEE1; }
+  h1, h2 { font-family: 'Space Grotesk', sans-serif; }
+  .card { background: #F3EEE1; border: 3px solid #18130F; box-shadow: 4px 4px 0 0 #18130F; }
+  .btn { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; font-size: 0.75rem;
+    letter-spacing: 0.05em; border: 3px solid #18130F; padding: 0.6rem 1.1rem; cursor: pointer;
+    transition: all 0.15s ease-out; }
+  .btn:hover { transform: translate(1px, 1px); }
+  .btn-gold { background: #E3A72E; }
+  .btn-dark { background: #18130F; color: #F3EEE1; }
+  .input-brut { border: 3px solid #18130F; padding: 0.65rem 1rem; background: #F3EEE1; outline: none; }
+  table { border-collapse: collapse; width: 100%; }
+  th { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; text-transform: uppercase;
+    letter-spacing: 0.1em; color: #5A4E3F; text-align: left; padding: 0.75rem 1rem; border-bottom: 3px solid #18130F; }
+  td { padding: 0.75rem 1rem; border-bottom: 1px solid rgba(24,19,15,0.12); font-size: 0.85rem; }
+</style>
+</head>
+<body class="text-ink font-sans">
+
+<!-- Login gate -->
+<div id="login-view" class="min-h-screen flex items-center justify-center px-6">
+  <div class="card p-8 w-full max-w-sm">
+    <h1 class="text-xl font-bold mb-1">Admin Login</h1>
+    <p class="text-sm text-ink-muted mb-6">LeadForge waitlist dashboard</p>
+    <form id="login-form" class="space-y-3">
+      <input type="email" id="login-email" placeholder="Email" required class="input-brut w-full" />
+      <input type="password" id="login-password" placeholder="Password" required class="input-brut w-full" />
+      <button type="submit" class="btn btn-gold w-full">Sign in</button>
+      <p id="login-error" class="text-xs text-rust hidden"></p>
+    </form>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard-view" class="hidden max-w-5xl mx-auto px-6 py-10">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <p class="text-xs font-mono uppercase tracking-widest text-ink-muted mb-1">Admin</p>
+      <h1 class="text-2xl font-bold">Waitlist Dashboard</h1>
+    </div>
+    <div class="flex gap-2">
+      <button id="export-btn" class="btn btn-dark">Export CSV</button>
+      <button id="notify-btn" class="btn btn-gold">Send Launch Email</button>
+      <button id="logout-btn" class="btn" style="background:#F3EEE1">Sign out</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-3 gap-4 mb-8">
+    <div class="card p-5">
+      <p class="text-xs font-mono uppercase tracking-widest text-ink-muted mb-1">Total signups</p>
+      <p class="text-3xl font-bold font-mono" id="stat-total">—</p>
+    </div>
+    <div class="card p-5">
+      <p class="text-xs font-mono uppercase tracking-widest text-ink-muted mb-1">Today</p>
+      <p class="text-3xl font-bold font-mono" id="stat-today">—</p>
+    </div>
+    <div class="card p-5">
+      <p class="text-xs font-mono uppercase tracking-widest text-ink-muted mb-1">Notified</p>
+      <p class="text-3xl font-bold font-mono" id="stat-notified">—</p>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card overflow-hidden">
+    <table>
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Joined</th>
+          <th>Notified</th>
+        </tr>
+      </thead>
+      <tbody id="waitlist-table">
+        <!-- rows injected by JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="js/supabase-client.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

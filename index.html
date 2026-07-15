@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeadForge — Automated Lead Generation for Agencies</title>
+<meta name="description" content="Find local businesses without websites, automatically. Google Maps → qualified leads → your Telegram. Join the waitlist.">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          paper: { DEFAULT: '#F3EEE1', 1: '#ECE4D1', 2: '#E1D5B8', 3: '#D6C7A3' },
+          ink:   { DEFAULT: '#18130F', 1: '#241C15', 2: '#332819', dim: '#5A4E3F', muted: '#8C7F6A' },
+          gold:  { DEFAULT: '#E3A72E', 1: '#C88F1F', soft: '#F2D896' },
+          rust:  { DEFAULT: '#C4522C', 1: '#9E3F20' },
+        },
+        fontFamily: {
+          display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'Menlo', 'monospace'],
+        },
+        borderWidth: { 3: '3px' },
+        boxShadow: {
+          brut: '4px 4px 0 0 #18130F',
+          'brut-sm': '2px 2px 0 0 #18130F',
+          'brut-gold': '4px 4px 0 0 #E3A72E',
+        },
+        animation: {
+          marquee: 'marquee 22s linear infinite',
+          'fade-in': 'fadeIn 0.4s ease-out',
+          'slide-up': 'slideUp 0.3s ease-out',
+          'bounce-slow': 'bounceSlow 2s ease-in-out infinite',
+        },
+        keyframes: {
+          marquee: { from: { transform: 'translateX(0)' }, to: { transform: 'translateX(-50%)' } },
+          fadeIn: { from: { opacity: 0 }, to: { opacity: 1 } },
+          slideUp: { from: { opacity: 0, transform: 'translateY(12px)' }, to: { opacity: 1, transform: 'translateY(0)' } },
+          bounceSlow: { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-6px)' } },
+        },
+      },
+    },
+  }
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  body {
+    background-color: #F3EEE1;
+    background-image: radial-gradient(rgba(24,19,15,0.05) 1px, transparent 1px);
+    background-size: 3px 3px;
+  }
+  h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.02em; }
+  .label { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.14em; color: #5A4E3F; }
+  .card { background: #F3EEE1; border: 3px solid #18130F; box-shadow: 4px 4px 0 0 #18130F; }
+  .btn-primary {
+    font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em;
+    background: #E3A72E; color: #18130F; border: 3px solid #18130F; box-shadow: 4px 4px 0 0 #18130F;
+    transition: all 0.15s ease-out; cursor: pointer;
+  }
+  .btn-primary:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 0 #18130F; }
+  .btn-primary:active { transform: translate(4px, 4px); box-shadow: none; }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: 4px 4px 0 0 #18130F; }
+  .input-brut {
+    background: #F3EEE1; border: 3px solid #18130F; font-family: 'Inter', sans-serif;
+    padding: 0.85rem 1rem; width: 100%; outline: none; font-size: 0.95rem;
+  }
+  .input-brut:focus { box-shadow: 3px 3px 0 0 #E3A72E; }
+  .ticker-band { background: #18130F; color: #F3EEE1; border-top: 3px solid #18130F; border-bottom: 3px solid #18130F; padding: 0.5rem 0; overflow: hidden; }
+  .ticker-track { display: flex; width: max-content; animation: marquee 22s linear infinite; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; }
+  .star { color: #E3A72E; }
+</style>
+</head>
+
+<body class="text-ink antialiased">
+
+<!-- Ticker -->
+<div class="ticker-band">
+  <div class="ticker-track" id="ticker">
+    <!-- filled by JS -->
+  </div>
+</div>
+
+<!-- Nav -->
+<header class="max-w-4xl mx-auto px-6 py-6 flex items-center justify-between">
+  <span class="font-display font-bold flex items-center gap-1.5 text-sm">
+    <span class="star">★</span> LEADFORGE
+  </span>
+  <span class="label">Launching soon</span>
+</header>
+
+<!-- Hero -->
+<section class="max-w-3xl mx-auto px-6 pt-10 pb-16 text-center">
+  <p class="label mb-4">For agencies doing local outreach</p>
+  <h1 class="text-4xl md:text-6xl font-bold leading-[1.05] mb-6 animate-fade-in">
+    Stop searching Google Maps<br/>by hand.
+  </h1>
+  <p class="text-ink-dim text-base md:text-lg leading-relaxed max-w-xl mx-auto mb-10">
+    LeadForge scrapes Google Maps, checks every business for a website, and drops
+    the ones without one straight into your Telegram. Automatically. On a schedule.
+    While you sleep.
+  </p>
+
+  <!-- Signup form -->
+  <div class="max-w-md mx-auto">
+    <form id="waitlist-form" class="card p-6 md:p-8 text-left">
+      <p class="label mb-4">Join the waitlist</p>
+
+      <div class="space-y-3 mb-4">
+        <input
+          type="email"
+          id="email-input"
+          required
+          placeholder="you@agency.com"
+          class="input-brut"
+        />
+        <select id="role-input" class="input-brut">
+          <option value="">What best describes you? (optional)</option>
+          <option value="agency">Web design agency</option>
+          <option value="freelancer">Freelancer</option>
+          <option value="seo">SEO agency</option>
+          <option value="marketing">Marketing agency</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <button type="submit" id="submit-btn" class="btn-primary w-full justify-center py-3.5 flex items-center gap-2">
+        <span id="btn-text">Get early access →</span>
+      </button>
+
+      <p id="form-message" class="text-xs mt-3 hidden"></p>
+    </form>
+
+    <!-- Social proof counter -->
+    <p class="label mt-4" id="waitlist-count">
+      <span class="inline-block w-2 h-2 rounded-full bg-gold animate-bounce-slow mr-1"></span>
+      Loading spots taken...
+    </p>
+  </div>
+</section>
+
+<div class="border-t-3 border-ink/10 max-w-4xl mx-auto"></div>
+
+<!-- How it works -->
+<section class="max-w-4xl mx-auto px-6 py-16">
+  <p class="label mb-2 text-center">How it works</p>
+  <h2 class="text-2xl md:text-3xl font-bold text-center mb-12">Three steps. Zero manual work.</h2>
+
+  <div class="grid md:grid-cols-3 gap-4">
+    <div class="card p-6">
+      <p class="text-3xl font-display font-bold text-gold mb-3">01</p>
+      <p class="font-semibold mb-1.5">Tell it what to find</p>
+      <p class="text-sm text-ink-muted leading-relaxed">Give it a keyword and a city — "Hair Salon" in "Lagos". That's the whole input.</p>
+    </div>
+    <div class="card p-6">
+      <p class="text-3xl font-display font-bold text-gold mb-3">02</p>
+      <p class="font-semibold mb-1.5">It does the searching</p>
+      <p class="text-sm text-ink-muted leading-relaxed">Scrapes Google Maps, checks every listing for a live website, filters out duplicates.</p>
+    </div>
+    <div class="card p-6">
+      <p class="text-3xl font-display font-bold text-gold mb-3">03</p>
+      <p class="font-semibold mb-1.5">Leads land in Telegram</p>
+      <p class="text-sm text-ink-muted leading-relaxed">Every qualified business — phone, address, rating — pushed the moment it qualifies.</p>
+    </div>
+  </div>
+</section>
+
+<div class="border-t-3 border-ink/10 max-w-4xl mx-auto"></div>
+
+<!-- Why -->
+<section class="max-w-3xl mx-auto px-6 py-16 text-center">
+  <h2 class="text-2xl md:text-3xl font-bold mb-6">Why this exists</h2>
+  <p class="text-ink-dim leading-relaxed max-w-xl mx-auto">
+    Every web agency does the same thing: search Maps, open listings, check for a website,
+    copy the phone number, save to a spreadsheet, repeat 300 times. It's the most obvious
+    business in the world for outreach — and the most tedious way to find it. LeadForge
+    turns that into a job you create once and forget about.
+  </p>
+</section>
+
+<!-- Final CTA -->
+<section class="max-w-3xl mx-auto px-6 pb-20 text-center">
+  <div class="card p-8 md:p-10">
+    <h2 class="text-2xl font-bold mb-3">Be first to try it.</h2>
+    <p class="text-ink-muted text-sm mb-6">No spam. One email when we launch — that's it.</p>
+    <button onclick="document.getElementById('email-input').focus()" class="btn-primary px-6 py-3 mx-auto">
+      Join the waitlist ↑
+    </button>
+  </div>
+</section>
+
+<!-- Ticker bottom -->
+<div class="ticker-band">
+  <div class="ticker-track"></div>
+</div>
+
+<script src="js/supabase-client.js"></script>
+<script src="js/waitlist.js"></script>
+</body>
+</html>
